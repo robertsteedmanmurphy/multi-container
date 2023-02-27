@@ -1,0 +1,69 @@
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  tag: 'TestV2' 
+  
+stages:
+# - stage: Build
+#   displayName: Build image
+#   jobs:
+#   - job: Build
+#     displayName: Build
+#     pool:
+#       vmImage: ubuntu-latest
+#     steps:       
+#     - task: Docker@2
+#       displayName: Build an image
+#       inputs:
+#         command: build
+#         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+#         repository: 'steedman/testazdo'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: Login to Docker Hub
+#       inputs:
+#         command: login
+#         containerRegistry: steedman_dockerHub
+
+#     - task: Docker@2
+#       displayName: 'Push the Docker image to Dockerhub'
+#       inputs:
+#         repository: 'steedman/testazdo'
+#         command: 'push'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: Logout of ACR
+#       inputs:
+#         command: logout
+#         containerRegistry: steedman_dockerHub
+
+- stage: Deploy
+  displayName: Deploy to AWS beanstalk
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: windows-latest
+    steps:       
+    - task: Bash@3
+      displayName: TempFile
+      inputs:
+        targetType: 'inline'
+        script: echo "hi there" > testFile.txt
+
+    - task: AWSCLI@1
+      displayName: AddTempFileToS3
+      inputs:
+        awsCredentials: 'aws4'
+        regionName: 'eu-west-1'
+        awsCommand: 's3'
+        awsSubCommand: 'cp'
+        awsArguments: 'testFile.txt s3://elasticbeanstalk-eu-west-1-498738601876'
