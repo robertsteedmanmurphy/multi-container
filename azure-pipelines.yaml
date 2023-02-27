@@ -8,22 +8,29 @@ variables:
   tag: 'TestV2' 
   
 stages:
-# - stage: Build
-#   displayName: Build image
-#   jobs:
-#   - job: Build
-#     displayName: Build
-#     pool:
-#       vmImage: ubuntu-latest
-#     steps:       
-#     - task: Docker@2
-#       displayName: Build an image
-#       inputs:
-#         command: build
-#         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-#         repository: 'steedman/testazdo'
-#         tags: |
-#           $(tag)
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:       
+    - task: Docker@2
+      displayName: Build an image
+      inputs:
+        command: buildgrep
+        dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile'
+        repository: 'steedman/react-test'
+        buildContext: '$(Build.SourcesDirectory)/client'
+        # tags: |
+        #   $(tag)
+
+    - task: Bash@3
+      displayName: grep docker images
+      inputs:
+        targetType: 'inline'
+        script: docker images | grep steedman
 
 #     - task: Docker@2
 #       displayName: Login to Docker Hub
@@ -45,25 +52,25 @@ stages:
 #         command: logout
 #         containerRegistry: steedman_dockerHub
 
-- stage: Deploy
-  displayName: Deploy to AWS beanstalk
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: windows-latest
-    steps:       
-    - task: Bash@3
-      displayName: TempFile
-      inputs:
-        targetType: 'inline'
-        script: echo "hi there" > testFile.txt
+# - stage: Deploy
+#   displayName: Deploy to AWS beanstalk
+#   jobs:
+#   - job: Build
+#     displayName: Build
+#     pool:
+#       vmImage: windows-latest
+#     steps:       
+#     - task: Bash@3
+#       displayName: TempFile
+#       inputs:
+#         targetType: 'inline'
+#         script: echo "hi there" > testFile.txt
 
-    - task: AWSCLI@1
-      displayName: AddTempFileToS3
-      inputs:
-        awsCredentials: 'aws4'
-        regionName: 'eu-west-1'
-        awsCommand: 's3'
-        awsSubCommand: 'cp'
-        awsArguments: 'testFile.txt s3://elasticbeanstalk-eu-west-1-498738601876'
+#     - task: AWSCLI@1
+#       displayName: AddTempFileToS3
+#       inputs:
+#         awsCredentials: 'aws4'
+#         regionName: 'eu-west-1'
+#         awsCommand: 's3'
+#         awsSubCommand: 'cp'
+#         awsArguments: 'testFile.txt s3://elasticbeanstalk-eu-west-1-498738601876'
