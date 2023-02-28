@@ -21,7 +21,7 @@ stages:
       inputs:
         command: build
         dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile.dev'
-        repository: 'steedman/react-test:$(tag)'
+        repository: 'steedman/react-test'
         buildContext: '$(Build.SourcesDirectory)/client'
 
     - task: Bash@3
