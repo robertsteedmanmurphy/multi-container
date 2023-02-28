@@ -8,156 +8,169 @@ variables:
   tag: $(Build.BuildId)
   
 stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
-    steps:     
-    # - task: Bash@3
-    #   displayName: docker tests
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: echo steedman/react-test:$(tag)
-
-### Image Test
-    - task: Docker@2
-      displayName: Build a test client image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile.dev'
-        repository: 'steedman/react-test'
-        buildContext: '$(Build.SourcesDirectory)/client'
-        tags: |
-          $(tag)
-
-    - task: Bash@3
-      displayName: grep docker images
-      inputs:
-        targetType: 'inline'
-        script: docker images | grep steedman
-
-    - task: Bash@3
-      displayName: docker tests
-      inputs:
-        targetType: 'inline'
-        script: docker run -e CI=true steedman/react-test:$(tag) npm test
-        tags: |
-          $(tag)
-
-### Image Build
-    - task: Docker@2
-      displayName: docker multi-client image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile'
-        repository: 'steedman/multi-client'
-        buildContext: '$(Build.SourcesDirectory)/client'
-        tags: |
-          $(tag)
-
-    - task: Docker@2
-      displayName: docker multi-nginx image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
-        repository: 'steedman/multi-nginx'
-        buildContext: '$(Build.SourcesDirectory)/nginx'
-        tags: |
-          $(tag)
-
-    - task: Docker@2
-      displayName: docker multi-server image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/server/Dockerfile'
-        repository: 'steedman/multi-server'
-        buildContext: '$(Build.SourcesDirectory)/server'
-        tags: |
-          $(tag)
-
-    - task: Docker@2
-      displayName: docker multi-worker image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/worker/Dockerfile'
-        repository: 'steedman/multi-worker'
-        buildContext: '$(Build.SourcesDirectory)/worker'
-        tags: |
-          $(tag)
-
-    - task: Bash@3
-      displayName: grep docker images
-      inputs:
-        targetType: 'inline'
-        script: docker images | grep steedman
-
-### DockerHub
-    - task: Docker@2
-      displayName: Login to Docker Hub
-      inputs:
-        command: login
-        containerRegistry: steedman_dockerHub
-
-    - task: Docker@2
-      displayName: 'Push multi-client to Dockerhub'
-      inputs:
-        repository: 'steedman/multi-client'
-        command: 'push'
-        tags: |
-          $(tag)
-
-    - task: Docker@2
-      displayName: 'Push multi-nginx to Dockerhub'
-      inputs:
-        repository: 'steedman/multi-nginx'
-        command: 'push'
-        tags: |
-          $(tag)
-
-    - task: Docker@2
-      displayName: 'Push multi-server to Dockerhub'
-      inputs:
-        repository: 'steedman/multi-server'
-        command: 'push'
-        tags: |
-          $(tag)
-
-    - task: Docker@2
-      displayName: 'Push multi-worker to Dockerhub'
-      inputs:
-        repository: 'steedman/multi-worker'
-        command: 'push'
-        tags: |
-          $(tag)
-
-    - task: Docker@2
-      displayName: Logout of ACR
-      inputs:
-        command: logout
-        containerRegistry: steedman_dockerHub
-
-# - stage: Deploy
-#   displayName: Deploy to AWS beanstalk
+# - stage: Build
+#   displayName: Build image
 #   jobs:
 #   - job: Build
 #     displayName: Build
 #     pool:
-#       vmImage: windows-latest
-#     steps:       
+#       vmImage: ubuntu-latest
+#     steps:     
+#     # - task: Bash@3
+#     #   displayName: docker tests
+#     #   inputs:
+#     #     targetType: 'inline'
+#     #     script: echo steedman/react-test:$(tag)
+
+# ### Image Test
+#     - task: Docker@2
+#       displayName: Build a test client image
+#       inputs:
+#         command: build
+#         dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile.dev'
+#         repository: 'steedman/react-test'
+#         buildContext: '$(Build.SourcesDirectory)/client'
+#         tags: |
+#           $(tag)
+
 #     - task: Bash@3
-#       displayName: TempFile
+#       displayName: grep docker images
 #       inputs:
 #         targetType: 'inline'
-#         script: echo "hi there" > testFile.txt
+#         script: docker images | grep steedman
 
-#     - task: AWSCLI@1
-#       displayName: AddTempFileToS3
+#     - task: Bash@3
+#       displayName: docker tests
 #       inputs:
-#         awsCredentials: 'aws4'
-#         regionName: 'eu-west-1'
-#         awsCommand: 's3'
-#         awsSubCommand: 'cp'
-#         awsArguments: 'testFile.txt s3://elasticbeanstalk-eu-west-1-498738601876'
+#         targetType: 'inline'
+#         script: docker run -e CI=true steedman/react-test:$(tag) npm test
+#         tags: |
+#           $(tag)
+
+# ### Image Build
+#     - task: Docker@2
+#       displayName: docker multi-client image
+#       inputs:
+#         command: build
+#         dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile'
+#         repository: 'steedman/multi-client'
+#         buildContext: '$(Build.SourcesDirectory)/client'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: docker multi-nginx image
+#       inputs:
+#         command: build
+#         dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
+#         repository: 'steedman/multi-nginx'
+#         buildContext: '$(Build.SourcesDirectory)/nginx'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: docker multi-server image
+#       inputs:
+#         command: build
+#         dockerfile: '$(Build.SourcesDirectory)/server/Dockerfile'
+#         repository: 'steedman/multi-server'
+#         buildContext: '$(Build.SourcesDirectory)/server'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: docker multi-worker image
+#       inputs:
+#         command: build
+#         dockerfile: '$(Build.SourcesDirectory)/worker/Dockerfile'
+#         repository: 'steedman/multi-worker'
+#         buildContext: '$(Build.SourcesDirectory)/worker'
+#         tags: |
+#           $(tag)
+
+#     - task: Bash@3
+#       displayName: grep docker images
+#       inputs:
+#         targetType: 'inline'
+#         script: docker images | grep steedman
+
+# ### DockerHub
+#     - task: Docker@2
+#       displayName: Login to Docker Hub
+#       inputs:
+#         command: login
+#         containerRegistry: steedman_dockerHub
+
+#     - task: Docker@2
+#       displayName: 'Push multi-client to Dockerhub'
+#       inputs:
+#         repository: 'steedman/multi-client'
+#         command: 'push'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: 'Push multi-nginx to Dockerhub'
+#       inputs:
+#         repository: 'steedman/multi-nginx'
+#         command: 'push'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: 'Push multi-server to Dockerhub'
+#       inputs:
+#         repository: 'steedman/multi-server'
+#         command: 'push'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: 'Push multi-worker to Dockerhub'
+#       inputs:
+#         repository: 'steedman/multi-worker'
+#         command: 'push'
+#         tags: |
+#           $(tag)
+
+#     - task: Docker@2
+#       displayName: Logout of ACR
+#       inputs:
+#         command: logout
+#         containerRegistry: steedman_dockerHub
+
+- stage: Deploy
+  displayName: Deploy to AWS beanstalk
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: windows-latest
+    steps:       
+
+    - task: AWSCLI@1
+      displayName: Copy DockerCompose to S3
+      inputs:
+        awsCredentials: 'aws4'
+        regionName: 'eu-west-1'
+        awsCommand: 's3'
+        awsSubCommand: 'cp'
+        awsArguments: 'docker-compose.yml s3://elasticbeanstalk-eu-west-1-498738601876'
+
+    - task: AWSCLI@1
+      displayName: Create ELB app version
+      inputs:
+        awsCredentials: 'aws4'
+        regionName: 'eu-west-1'
+        awsCommand: 'elasticbeanstalk'
+        awsSubCommand: 'create-application-version'
+        awsArguments: '--application-name "multi-docker" --version-label 1 --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-498738601876",S3Key=docker-compose.yml'
+
+    - task: AWSCLI@1
+      displayName: Update ELB to app version
+      inputs:
+        awsCredentials: 'aws4'
+        regionName: 'eu-west-1'
+        awsCommand: 'elasticbeanstalk'
+        awsSubCommand: 'update-environment'
+        awsArguments: '--application-name "multi-docker" --environment-name "Multidocker-env" --version-label=1'
