@@ -4,8 +4,8 @@ trigger:
 resources:
 - repo: self
 
-# variables:
-#   tag: 'TestV2' 
+variables:
+  tag: $(Build.BuildNumber)
   
 stages:
 - stage: Build
@@ -83,7 +83,7 @@ stages:
     #     script: docker images | grep steedman
 
 
-    
+
 #     - task: Docker@2
 #       displayName: Login to Docker Hub
 #       inputs:
