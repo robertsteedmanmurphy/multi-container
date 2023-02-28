@@ -21,10 +21,8 @@ stages:
       inputs:
         command: build
         dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile.dev'
-        repository: 'steedman/react-test'
+        repository: 'steedman/react-test:$(tag)'
         buildContext: '$(Build.SourcesDirectory)/client'
-        tags: |
-          $(tag)
 
     - task: Bash@3
       displayName: grep docker images
