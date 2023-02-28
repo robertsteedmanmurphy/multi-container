@@ -22,6 +22,7 @@ stages:
     #     targetType: 'inline'
     #     script: echo steedman/react-test:$(tag)
 
+### Image Test
     - task: Docker@2
       displayName: Build a test client image
       inputs:
@@ -46,6 +47,7 @@ stages:
         tags: |
           $(tag)
 
+### Image Build
     - task: Docker@2
       displayName: docker multi-client image
       inputs:
@@ -92,27 +94,50 @@ stages:
         targetType: 'inline'
         script: docker images | grep steedman
 
+### DockerHub
+    - task: Docker@2
+      displayName: Login to Docker Hub
+      inputs:
+        command: login
+        containerRegistry: steedman_dockerHub
 
+    - task: Docker@2
+      displayName: 'Push multi-client to Dockerhub'
+      inputs:
+        repository: 'steedman/multi-client'
+        command: 'push'
+        tags: |
+          $(tag)
 
-#     - task: Docker@2
-#       displayName: Login to Docker Hub
-#       inputs:
-#         command: login
-#         containerRegistry: steedman_dockerHub
+    - task: Docker@2
+      displayName: 'Push multi-nginx to Dockerhub'
+      inputs:
+        repository: 'steedman/multi-nginx'
+        command: 'push'
+        tags: |
+          $(tag)
 
-#     - task: Docker@2
-#       displayName: 'Push the Docker image to Dockerhub'
-#       inputs:
-#         repository: 'steedman/testazdo'
-#         command: 'push'
-#         tags: |
-#           $(tag)
+    - task: Docker@2
+      displayName: 'Push multi-server to Dockerhub'
+      inputs:
+        repository: 'steedman/multi-server'
+        command: 'push'
+        tags: |
+          $(tag)
 
-#     - task: Docker@2
-#       displayName: Logout of ACR
-#       inputs:
-#         command: logout
-#         containerRegistry: steedman_dockerHub
+    - task: Docker@2
+      displayName: 'Push multi-worker to Dockerhub'
+      inputs:
+        repository: 'steedman/multi-worker'
+        command: 'push'
+        tags: |
+          $(tag)
+
+    - task: Docker@2
+      displayName: Logout of ACR
+      inputs:
+        command: logout
+        containerRegistry: steedman_dockerHub
 
 # - stage: Deploy
 #   displayName: Deploy to AWS beanstalk
