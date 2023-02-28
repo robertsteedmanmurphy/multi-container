@@ -23,8 +23,8 @@ stages:
         dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile.dev'
         repository: 'steedman/react-test'
         buildContext: '$(Build.SourcesDirectory)/client'
-        # tags: |
-        #   $(tag)
+        tags: |
+          $(tag)
 
     - task: Bash@3
       displayName: grep docker images
@@ -37,14 +37,41 @@ stages:
       inputs:
         targetType: 'inline'
         script: docker run -e CI=true steedman/react-test npm test
+        tags: |
+          $(tag)
 
-    # - task: Docker@2
-    #   displayName: docker multi-client image
-    #   inputs:
-    #     command: build
-    #     dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile'
-    #     repository: 'steedman/react-test'
-    #     buildContext: '$(Build.SourcesDirectory)/client'
+    - task: Docker@2
+      displayName: docker multi-client image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile'
+        repository: 'steedman/multi-client'
+        buildContext: '$(Build.SourcesDirectory)/client'
+
+    - task: Docker@2
+      displayName: docker multi-nginx image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
+        repository: 'steedman/multi-nginx'
+        buildContext: '$(Build.SourcesDirectory)/nginx'
+
+    - task: Docker@2
+      displayName: docker multi-server image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/server/Dockerfile'
+        repository: 'steedman/multi-server'
+        buildContext: '$(Build.SourcesDirectory)/server'
+
+    - task: Docker@2
+      displayName: docker multi-worker image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/worker/Dockerfile'
+        repository: 'steedman/multi-worker'
+        buildContext: '$(Build.SourcesDirectory)/worker'
+
 #     - task: Docker@2
 #       displayName: Login to Docker Hub
 #       inputs:
