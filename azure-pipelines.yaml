@@ -5,7 +5,7 @@ resources:
 - repo: self
 
 variables:
-  tag: $(Build.BuildNumber)
+  tag: $(Build.BuildId)
   
 stages:
 - stage: Build
@@ -16,71 +16,81 @@ stages:
     pool:
       vmImage: ubuntu-latest
     steps:     
-    - task: Bash@3
-      displayName: docker tests
-      inputs:
-        targetType: 'inline'
-        script: echo steedman/react-test:$(tag)
-
-    # - task: Docker@2
-    #   displayName: Build a test client image
-    #   inputs:
-    #     command: build
-    #     dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile.dev'
-    #     repository: 'steedman/react-test'
-    #     buildContext: '$(Build.SourcesDirectory)/client'
-
-    # - task: Bash@3
-    #   displayName: grep docker images
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: docker images | grep steedman
-
     # - task: Bash@3
     #   displayName: docker tests
     #   inputs:
     #     targetType: 'inline'
-    #     script: docker run -e CI=true steedman/react-test:$(tag) npm test
-    #     # tags: |
-    #     #   $(tag)
+    #     script: echo steedman/react-test:$(tag)
 
-    # - task: Docker@2
-    #   displayName: docker multi-client image
-    #   inputs:
-    #     command: build
-    #     dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile'
-    #     repository: 'steedman/multi-client'
-    #     buildContext: '$(Build.SourcesDirectory)/client'
+    - task: Docker@2
+      displayName: Build a test client image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile.dev'
+        repository: 'steedman/react-test'
+        buildContext: '$(Build.SourcesDirectory)/client'
+        tags: |
+          $(tag)
 
-    # - task: Docker@2
-    #   displayName: docker multi-nginx image
-    #   inputs:
-    #     command: build
-    #     dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
-    #     repository: 'steedman/multi-nginx'
-    #     buildContext: '$(Build.SourcesDirectory)/nginx'
+    - task: Bash@3
+      displayName: grep docker images
+      inputs:
+        targetType: 'inline'
+        script: docker images | grep steedman
 
-    # - task: Docker@2
-    #   displayName: docker multi-server image
-    #   inputs:
-    #     command: build
-    #     dockerfile: '$(Build.SourcesDirectory)/server/Dockerfile'
-    #     repository: 'steedman/multi-server'
-    #     buildContext: '$(Build.SourcesDirectory)/server'
+    - task: Bash@3
+      displayName: docker tests
+      inputs:
+        targetType: 'inline'
+        script: docker run -e CI=true steedman/react-test:$(tag) npm test
+        tags: |
+          $(tag)
 
-    # - task: Docker@2
-    #   displayName: docker multi-worker image
-    #   inputs:
-    #     command: build
-    #     dockerfile: '$(Build.SourcesDirectory)/worker/Dockerfile'
-    #     repository: 'steedman/multi-worker'
-    #     buildContext: '$(Build.SourcesDirectory)/worker'
+    - task: Docker@2
+      displayName: docker multi-client image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/client/Dockerfile'
+        repository: 'steedman/multi-client'
+        buildContext: '$(Build.SourcesDirectory)/client'
+        tags: |
+          $(tag)
 
-    # - task: Bash@3
-    #   displayName: grep docker images
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: docker images | grep steedman
+    - task: Docker@2
+      displayName: docker multi-nginx image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
+        repository: 'steedman/multi-nginx'
+        buildContext: '$(Build.SourcesDirectory)/nginx'
+        tags: |
+          $(tag)
+
+    - task: Docker@2
+      displayName: docker multi-server image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/server/Dockerfile'
+        repository: 'steedman/multi-server'
+        buildContext: '$(Build.SourcesDirectory)/server'
+        tags: |
+          $(tag)
+
+    - task: Docker@2
+      displayName: docker multi-worker image
+      inputs:
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/worker/Dockerfile'
+        repository: 'steedman/multi-worker'
+        buildContext: '$(Build.SourcesDirectory)/worker'
+        tags: |
+          $(tag)
+
+    - task: Bash@3
+      displayName: grep docker images
+      inputs:
+        targetType: 'inline'
+        script: docker images | grep steedman
 
 
 
