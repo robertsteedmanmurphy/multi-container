@@ -40,8 +40,9 @@ app.get("/", (req, res) => {
   res.send("Hi");
 });
 
+// Get all values that have been submitted to redis and return all the indexs and values 
 app.get("/values/all", async (req, res) => {
-  const values = await pgClient.query("SELECT * from values");
+  const values = await pgClient.query("SELECT * from values"); // Returns all fields and values of the hash stored at key.
 
   res.send(values.rows);
 });
@@ -59,11 +60,11 @@ app.post("/values", async (req, res) => {
     return res.status(422).send("Index too high");
   }
 
-  redisClient.hset("values", index, "Nothing yet!");
-  redisPublisher.publish("insert", index);
-  pgClient.query("INSERT INTO values(number) VALUES($1)", [index]);
+  redisClient.hset("values", index, "Nothing yet!"); // Initially adds the value to the redis data store. Sets the specified fields to their respective values in the hash stored at key.
+  redisPublisher.publish("insert", index); // Publishes a message to the redis channel. the first argument is the name of the channel to publish the message to, and the second argument is the message to be published. This will 'wake up' the worker and tell it to get the value for the server 
+  pgClient.query("INSERT INTO values(number) VALUES($1)", [index]); // Store the indices that have been queried to Postgres
 
-  res.send({ working: true });
+  res.send({ working: true }); // arbitrary return value
 });
 
 app.listen(5000, (err) => {

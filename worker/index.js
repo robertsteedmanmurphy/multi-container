@@ -13,7 +13,10 @@ function fib(index) {
   return fib(index - 1) + fib(index - 2);
 }
 
+// will watch redis for anytime a new message appears in redis
 sub.on('message', (channel, message) => {
-  redisClient.hset('values', message, fib(parseInt(message)));
+  // ORG server message. 
+  // redisClient.hset("values", index, "Nothing yet!"); // Sets the specified fields to their respective values in the hash stored at key.
+  redisClient.hset('values', message, fib(parseInt(message))); // Sets the specified fields to their respective values in the hash stored at key.
 });
-sub.subscribe('insert');
+sub.subscribe('insert'); // Subscribes to any insert event
